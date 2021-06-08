@@ -45,7 +45,7 @@ spec:
         tier: frontend
     spec:
       containers:
-      - image: dokuwiki:20200729-debian-10-r272
+      - image: dokuwiki:20200729
         name: dokuwiki
         env:
         - name: DOKUWIKI_DB_HOST
