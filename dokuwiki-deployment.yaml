@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dokuwiki
+  labels:
+    app: dokuwiki
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: dokuwiki
+    tier: frontend
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dokuwiki-pv-claim
+  labels:
+    app: dokuwiki
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dokuwiki
+  labels:
+    app: dokuwiki
+spec:
+  selector:
+    matchLabels:
+      app: dokuwiki
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: dokuwiki
+        tier: frontend
+    spec:
+      containers:
+      - image: dokuwiki:20200729-debian-10-r272
+        name: dokuwiki
+        env:
+        - name: DOKUWIKI_DB_HOST
+          value: dokuwiki-mysql
+        - name: DOKUWIKI_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+        ports:
+        - containerPort: 80
+          name: dokuwiki
+        volumeMounts:
+        - name: dokuwiki-persistent-storage
+          mountPath: /var/www/html
+      volumes:
+      - name: dokuwiki-persistent-storage
+        persistentVolumeClaim:
+          claimName: ghost-pv-claim
