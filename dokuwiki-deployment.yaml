@@ -64,4 +64,4 @@ spec:
       volumes:
       - name: dokuwiki-persistent-storage
         persistentVolumeClaim:
-          claimName: ghost-pv-claim
+          claimName: dokuwiki-pv-claim
